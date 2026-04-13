@@ -5,10 +5,10 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // Full path to WAV file
+        // Relative path to WAV file
         string wavFilePath = @"Assets\Turbo_Cybersecurity.wav";
 
-        // Play the WAV file
+        // Play the WAV file (skipped in CI)
         PlayStartupSound(wavFilePath);
 
         ConsoleHelper.PrintHeader();
@@ -19,6 +19,13 @@ public class Program
 
     private static void PlayStartupSound(string filePath)
     {
+        // Skip audio if running in GitHub Actions
+        if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true")
+        {
+            Console.WriteLine("Skipping WAV playback in CI.");
+            return;
+        }
+
         try
         {
             using (var player = new SoundPlayer(filePath))
