@@ -1,47 +1,39 @@
-# File: .github/workflows/chatbot-ci.yml
-name: Build and Run Turbo Security Chatbot
+# This is a Github Actions workflow that builds and tests the .NET project.
+
+name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build-and-run:
+  build:
     runs-on: windows-latest
-
     steps:
-      # 1️⃣ Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      # 2️⃣ Setup .NET SDK
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '8.0.x'  # Match your project SDK version
+          dotnet-version: '5.0.x'
 
-      # 3️⃣ Restore dependencies for the chatbot project only
       - name: Restore dependencies
-        run: dotnet restore "P.O.E Yr2/P.O.E Yr2.csproj"
+        run: dotnet restore "P.O.E Yr2/P.O.E Yr2/P.O.E Yr2.csproj"
 
-      # 4️⃣ Build the chatbot project
       - name: Build project
-        run: dotnet build "P.O.E Yr2/P.O.E Yr2.csproj" --configuration Release --no-restore
+        run: dotnet build "P.O.E Yr2/P.O.E Yr2/P.O.E Yr2.csproj" --configuration Release --no-restore
 
-      # 5️⃣ Verify WAV file exists
-      - name: Verify WAV file
+      - name: Run tests
+        run: dotnet test "P.O.E Yr2/P.O.E Yr2/P.O.E Yr2.csproj" --no-restore --verbosity normal
+
+      - name: Check for WAV files
         run: |
-          if [ ! -f "P.O.E Yr2/Assets/Turbo_Cybersecurity.wav" ]; then
-            echo "Error: WAV file 'Turbo_Cybersecurity.wav' not found!"
+          if (!(Test-Path 'path/to/wavfile.wav')) {
+            Write-Error 'WAV file not found!'
             exit 1
-          else
-            echo "WAV file found."
-          fi
-
-      # 6️⃣ Run the chatbot (skip audio in CI)
-      - name: Run chatbot
-        run: dotnet run --project "P.O.E Yr2/P.O.E Yr2.csproj"
-        env:
-          GITHUB_ACTIONS: true  # Used in Program.cs to skip SoundPlayer
+          }
