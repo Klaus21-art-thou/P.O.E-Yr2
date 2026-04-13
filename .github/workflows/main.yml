@@ -1,4 +1,4 @@
-name: CI
+name: CI - TurboSecurityBot
 
 on:
   push:
@@ -7,22 +7,25 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Step 2: Setup .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      - name: Verify WAV file exists (cross-platform)
+      # Step 3: Verify WAV file exists (cross-platform)
+      - name: Verify WAV file exists
         shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
         run: |
           if (${{ matrix.os == 'windows-latest' }}) {
@@ -44,5 +47,17 @@ jobs:
             fi
           }
 
-      - name: Build project
-        run: dotnet build
+      # Step 4: Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Step 5: Build the project
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      # Step 6: Test run (non-interactive)
+      - name: Run chatbot in test mode
+        run: |
+          echo "Testing TurboSecurityBot startup..."
+          dotnet run --project ./YourProjectName --no-build
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
