@@ -22,12 +22,12 @@ jobs:
           dotnet-version: '6.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore "./P.O.E Yr2/P.O.E Yr2.csproj"
+        run: dotnet restore "P.O.E Yr2/P.O.E Yr2.csproj"
 
       - name: Build project
-        run: dotnet build "./P.O.E Yr2/P.O.E Yr2.csproj" --configuration Release
+        run: dotnet build "P.O.E Yr2/P.O.E Yr2.csproj" --configuration Release
 
       - name: Run TurboSecurityBot
-        run: dotnet run --project "./P.O.E Yr2/P.O.E Yr2.csproj"
+        run: dotnet run --project "P.O.E Yr2/P.O.E Yr2.csproj"
         env:
           GITHUB_ACTIONS: true
