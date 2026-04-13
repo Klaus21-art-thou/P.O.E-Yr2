@@ -1,4 +1,4 @@
-name: Build and Test TurboSecurityBot
+name: Build and Run TurboSecurityBot
 
 on:
   push:
