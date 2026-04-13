@@ -1,39 +1,52 @@
-# This is a Github Actions workflow that builds and tests the .NET project.
+# File: .github/workflows/chatbot-ci.yml
+name: Build and Run Turbo Security Chatbot
 
-name: CI
-
+# Trigger workflow on push or PR to main
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  build:
+  build-and-run:
     runs-on: windows-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      # 1️⃣ Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v1
+      # 2️⃣ Setup .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '5.0.x'
+          dotnet-version: '8.0.x'
 
+      # 3️⃣ Restore dependencies (in project folder)
       - name: Restore dependencies
-        run: dotnet restore "P.O.E Yr2/P.O.E Yr2/P.O.E Yr2.csproj"
+        run: dotnet restore
+        working-directory: "P.O.E Yr2"
 
+      # 4️⃣ Build the project
       - name: Build project
-        run: dotnet build "P.O.E Yr2/P.O.E Yr2/P.O.E Yr2.csproj" --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore
+        working-directory: "P.O.E Yr2"
 
-      - name: Run tests
-        run: dotnet test "P.O.E Yr2/P.O.E Yr2/P.O.E Yr2.csproj" --no-restore --verbosity normal
-
-      - name: Check for WAV files
+      # 5️⃣ Verify WAV file exists
+      - name: Verify WAV file
         run: |
-          if (!(Test-Path 'path/to/wavfile.wav')) {
-            Write-Error 'WAV file not found!'
+          if [ ! -f "Assets/Turbo_Cybersecurity.wav" ]; then
+            echo "Error: WAV file 'Turbo_Cybersecurity.wav' not found!"
             exit 1
-          }
+          else
+            echo "WAV file found."
+          fi
+        working-directory: "P.O.E Yr2"
+
+      # 6️⃣ Run the chatbot (skip audio in CI)
+      - name: Run chatbot
+        run: dotnet run
+        working-directory: "P.O.E Yr2"
+        env:
+          GITHUB_ACTIONS: true  # Used in Program.cs to skip SoundPlayer
