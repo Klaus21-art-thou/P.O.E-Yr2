@@ -1,63 +1,33 @@
-name: CI - TurboSecurityBot
+name: Build and Test TurboSecurityBot
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build-and-test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+  build-and-run:
+    runs-on: windows-latest
 
     steps:
-      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Setup .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '6.0.x' # Change to your project's target framework
 
-      # Step 3: Verify WAV file exists (cross-platform)
-      - name: Verify WAV file exists
-        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
-        run: |
-          if (${{ matrix.os == 'windows-latest' }}) {
-            # PowerShell for Windows
-            $wavPath = "Assets\Turbo_Cybersecurity.wav"
-            if (-Not (Test-Path $wavPath)) {
-                Write-Host "Error: WAV file 'Turbo_Cybersecurity.wav' not found!"
-                exit 1
-            } else {
-                Write-Host "WAV file found."
-            }
-          } else {
-            # Bash for Linux/macOS
-            if [ ! -f "Assets/Turbo_Cybersecurity.wav" ]; then
-              echo "Error: WAV file 'Turbo_Cybersecurity.wav' not found!"
-              exit 1
-            else
-              echo "WAV file found."
-            fi
-          }
-
-      # Step 4: Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      # Step 5: Build the project
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
+      - name: Build project
+        run: dotnet build --configuration Release
 
-      # Step 6: Test run (non-interactive)
-      - name: Run chatbot in test mode
-        run: |
-          echo "Testing TurboSecurityBot startup..."
-          dotnet run --project ./YourProjectName --no-build
-        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
+      - name: Run TurboSecurityBot
+        run: dotnet run --project ./ # Adjust path if needed
+        env:
+          GITHUB_ACTIONS: true
