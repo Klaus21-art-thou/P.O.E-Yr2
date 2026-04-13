@@ -19,15 +19,15 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x' # Change to your project's target framework
+          dotnet-version: '6.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./TurboSecurityBot.csproj
 
       - name: Build project
-        run: dotnet build --configuration Release
+        run: dotnet build ./TurboSecurityBot.csproj --configuration Release
 
       - name: Run TurboSecurityBot
-        run: dotnet run --project ./ # Adjust path if needed
+        run: dotnet run --project ./TurboSecurityBot.csproj
         env:
           GITHUB_ACTIONS: true
