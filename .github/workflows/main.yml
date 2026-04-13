@@ -21,28 +21,32 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  # Match your local SDK version
+          dotnet-version: '8.0.x'
 
-      # 3️⃣ Restore dependencies (point to your .csproj)
+      # 3️⃣ Restore dependencies (in project folder)
       - name: Restore dependencies
-        run: dotnet restore "P.O.E Yr2/P.O.E Yr2.csproj"
+        run: dotnet restore
+        working-directory: "P.O.E Yr2"
 
       # 4️⃣ Build the project
       - name: Build project
-        run: dotnet build "P.O.E Yr2/P.O.E Yr2.csproj" --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore
+        working-directory: "P.O.E Yr2"
 
       # 5️⃣ Verify WAV file exists
       - name: Verify WAV file
         run: |
-          if [ ! -f "P.O.E Yr2/Assets/Turbo_Cybersecurity.wav" ]; then
+          if [ ! -f "Assets/Turbo_Cybersecurity.wav" ]; then
             echo "Error: WAV file 'Turbo_Cybersecurity.wav' not found!"
             exit 1
           else
             echo "WAV file found."
           fi
+        working-directory: "P.O.E Yr2"
 
       # 6️⃣ Run the chatbot (skip audio in CI)
       - name: Run chatbot
-        run: dotnet run --project "P.O.E Yr2/P.O.E Yr2.csproj"
+        run: dotnet run
+        working-directory: "P.O.E Yr2"
         env:
           GITHUB_ACTIONS: true  # Used in Program.cs to skip SoundPlayer
