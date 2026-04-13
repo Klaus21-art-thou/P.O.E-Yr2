@@ -1,0 +1,50 @@
+
+name: Build and Run Turbo Security Chatbot
+
+# Trigger the workflow on push or pull request to main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-run:
+    runs-on: windows-latest
+
+    steps:
+   
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+  
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'  # Match your project SDK version
+
+     
+      - name: Restore dependencies
+        run: dotnet restore
+
+     
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
+
+    
+      - name: Verify WAV file
+        run: |
+          if [ ! -f "Assets/Turbo_Cybersecurity.wav" ]; then
+            echo "Error: WAV file 'Assets/Turbo_Cybersecurity.wav' not found!"
+            exit 1
+          else
+            echo "WAV file found."
+          fi
+
+      
+      - name: Run chatbot
+        run: |
+          echo "Starting chatbot in GitHub Actions (audio skipped)..."
+          dotnet run --project ./
+        env:
+          GITHUB_ACTIONS: true  # Optional: used in Program.cs to skip SoundPlayer
